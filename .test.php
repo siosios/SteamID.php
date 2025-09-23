@@ -187,27 +187,21 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals( '157625991261918636', $s->RenderSteam2() );
 	}
 
-	/**
-	 * @dataProvider steam3StringProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('steam3StringProvider')]
 	public function testSteam3StringSymmetric( string $SteamID ) : void
 	{
 		$s = new SteamID( $SteamID );
 		$this->assertEquals( $SteamID, $s->RenderSteam3() );
 	}
 
-	/**
-	 * @dataProvider steamId64BitProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('steamId64BitProvider')]
 	public function testConvertToUInt64( string $SteamID ) : void
 	{
 		$s = new SteamID( $SteamID );
 		$this->assertEquals( $SteamID, $s->ConvertToUInt64() );
 	}
 
-	/**
-	 * @dataProvider steamId64BitProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('steamId64BitProvider')]
 	public function testSetFromUInt64( string $SteamID ) : void
 	{
 		$s = new SteamID();
@@ -215,19 +209,14 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals( $SteamID, $s->ConvertToUInt64() );
 	}
 
-	/**
-	 * @dataProvider steamId64BitProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('steamId64BitProvider')]
 	public function testToStringCast( string $SteamID ) : void
 	{
 		$s = new SteamID( $SteamID );
 		$this->assertEquals( $SteamID, (string)$s );
 	}
 
-	/**
-	 * @dataProvider invalidIdProvider
-	 * @param int|string|null $SteamID
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('invalidIdProvider')]
 	public function testConstructorHandlesInvalid( $SteamID ) : void
 	{
 		$this->expectException( InvalidArgumentException::class );
@@ -236,9 +225,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		new SteamID( $SteamID );
 	}
 
-	/**
-	 * @dataProvider invalidAccountIdsOverflowProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('invalidAccountIdsOverflowProvider')]
 	public function testInvalidConstructorOverflow( string $SteamID ) : void
 	{
 		$this->expectException( InvalidArgumentException::class );
@@ -256,18 +243,14 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$s->SetFromUInt64( '111failure111' );
 	}
 
-	/**
-	 * @dataProvider vanityUrlProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('vanityUrlProvider')]
 	public function testSetFromUrl( string $URL ) : void
 	{
 		$s = SteamID::SetFromURL( $URL, [ $this, 'fakeResolveVanityURL' ] );
 		$this->assertTrue( $s->IsValid() );
 	}
 
-	/**
-	 * @dataProvider inviteUrlProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('inviteUrlProvider')]
 	public function testSetFromInviteUrl( string $URL ) : void
 	{
 		$s = SteamID::SetFromURL( $URL, [ $this, 'fakeResolveVanityURL' ] );
@@ -345,9 +328,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals( 'w', $a->RenderSteamInvite() );
 	}
 
-	/**
-	 * @dataProvider invalidVanityUrlProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('invalidVanityUrlProvider')]
 	public function testInvalidSetFromUrl( string $URL ) : void
 	{
 		$this->expectException( InvalidArgumentException::class );
@@ -355,9 +336,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		SteamID::SetFromURL( $URL, [ $this, 'fakeResolveVanityURL' ] );
 	}
 
-	/**
-	 * @dataProvider notFoundVanityUrlProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('notFoundVanityUrlProvider')]
 	public function testSetFromUrlCode404( string $URL ) : void
 	{
 		$this->expectException( InvalidArgumentException::class );
@@ -390,9 +369,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals( 'ALQF4-BYCA', $a->RenderCsgoFriendCode() );
 	}
 
-	/**
-	 * @dataProvider validCsgoCodeProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('validCsgoCodeProvider')]
 	public function testSetFromCsgoFriendCodes(string $code, string $expected) : void
 	{
 		$s = (new SteamID())->SetFromCsgoFriendCode($code);
@@ -417,9 +394,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$s->SetFromCsgoFriendCode( 'AAAAA-ZZZZZ' );
 	}
 
-	/**
-	 * @dataProvider invalidCsgoCodeProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('invalidCsgoCodeProvider')]
 	public function testInvalidCsgoFriendCodes(string $code) : void
 	{
 		$this->expectException(InvalidArgumentException::class);
@@ -427,9 +402,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		(new SteamID())->SetFromCsgoFriendCode($code);
 	}
 
-	/**
-	 * @dataProvider setterOverflowProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('setterOverflowProvider')]
 	public function testSetterOverflow(string $method, int $value) : void
 	{
 		$this->expectException(InvalidArgumentException::class);
@@ -457,9 +430,7 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$s->SetAccountID(-1);
 	}
 
-	/**
-	 * @dataProvider validUrlVariationsProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('validUrlVariationsProvider')]
 	public function testSetFromURLVariations(string $url, string $expected) : void
 	{
 		$s = SteamID::SetFromURL($url, [$this, 'fakeResolveVanityURL']);
@@ -609,18 +580,14 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals('[g:2:123]', $s->RenderSteam3());
 	}
 
-	/**
-	 * @dataProvider fromAccountIdInvalidProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('fromAccountIdInvalidProvider')]
 	public function testFromAccountIDInvalid(int $accountId) : void
 	{
 		$this->expectException(InvalidArgumentException::class);
 		SteamID::FromAccountID($accountId);
 	}
 
-	/**
-	 * @dataProvider staticHelperProvider
-	 */
+	#[PHPUnit\Framework\Attributes\DataProvider('staticHelperProvider')]
 	public function testStaticHelpers(string $method, int $input, string $expected) : void
 	{
 		$result = SteamID::$method($input);
