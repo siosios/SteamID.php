@@ -390,30 +390,13 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals( 'ALQF4-BYCA', $a->RenderCsgoFriendCode() );
 	}
 
-	public function testSetFromCsgoFriendCodes() : void
+	/**
+	 * @dataProvider validCsgoCodeProvider
+	 */
+	public function testSetFromCsgoFriendCodes(string $code, string $expected) : void
 	{
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'ALQF4-BYCA' );
-		$this->assertEquals( '[U:1:12229257]', $a->RenderSteam3() );
-
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'SFW3A-MPAQ' );
-		$this->assertEquals( '[U:1:123777904]', $a->RenderSteam3() );
-
-		// Generated id without md5 niblets ($HashNibble=0), still parses because parser ignores it
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'ALGFL-BYAA' );
-		$this->assertEquals( '[U:1:12229257]', $a->RenderSteam3() );
-
-		// Generated id without md5 niblets ($HashNibble=1), still parses because parser ignores it
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'AQQP4-BZDC' );
-		$this->assertEquals( '[U:1:12229257]', $a->RenderSteam3() );
-
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'AQGPL-3EUJ-SYLSB-J5SL' );
-		$this->assertEquals( '[U:1:12229257]', $a->RenderSteam3() );
-
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'AJJA6-SSEL-AAJJE-AVBC' );
-		$this->assertEquals( '[U:1:1]', $a->RenderSteam3() );
-
-		$a = ( new SteamID() )->SetFromCsgoFriendCode( 'ATWCB-GBBA-ABLAB-ABCC' );
-		$this->assertEquals( '[g:1:4777282]', $a->RenderSteam3() );
+		$s = (new SteamID())->SetFromCsgoFriendCode($code);
+		$this->assertEquals($expected, $s->RenderSteam3());
 	}
 
 	public function testNotIndividualCsgoFriendCodes() : void
@@ -434,95 +417,23 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$s->SetFromCsgoFriendCode( 'AAAAA-ZZZZZ' );
 	}
 
-	public function testInvalidFriendCodeLength( ) : void
+	/**
+	 * @dataProvider invalidCsgoCodeProvider
+	 */
+	public function testInvalidCsgoFriendCodes(string $code) : void
 	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'AAAAA-AAAA-AAAAA-AAAA-' );
+		$this->expectException(InvalidArgumentException::class);
+		$this->expectExceptionMessage('Given input is not a valid CS:GO code.');
+		(new SteamID())->SetFromCsgoFriendCode($code);
 	}
 
-	public function testInvalidFriendCodeDash1( ) : void
+	/**
+	 * @dataProvider setterOverflowProvider
+	 */
+	public function testSetterOverflow(string $method, int $value) : void
 	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'AAAAAAAAAA' );
-	}
-
-	public function testInvalidFriendCodeDash2( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'AAAAA-AAAA-AAAAAAAAAA' );
-	}
-
-	public function testInvalidFriendCodeDash3( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'AAAAAAAAAA-AAAAA-AAAA' );
-	}
-
-	public function testInvalidFriendCodeDash4( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'AAAAA-AAAAAAAAAA-AAAA' );
-	}
-
-	public function testInvalidFriendCodeFuzzer1( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( 'STEAM-AM-A' );
-	}
-
-	public function testInvalidFriendCodeFuzzer2( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-		$this->expectExceptionMessage( 'Given input is not a valid CS:GO code.' );
-
-		$s = new SteamID( );
-		$s->SetFromCsgoFriendCode( '11111-1111' );
-	}
-
-	public function testAccountIdMaxValue( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-
-		( new SteamID() )->SetAccountID( 0xFFFFFFFF + 1 );
-	}
-
-	public function testAccountTypeMaxValue( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-
-		( new SteamID() )->SetAccountType( 0xF + 1 );
-	}
-
-	public function testAccountInstanceMaxValue( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-
-		( new SteamID() )->SetAccountInstance( 0xFFFFF + 1 );
-	}
-
-	public function testAccountUniverseMaxValue( ) : void
-	{
-		$this->expectException( InvalidArgumentException::class );
-
-		( new SteamID() )->SetAccountUniverse( 0xFF + 1 );
+		$this->expectException(InvalidArgumentException::class);
+		(new SteamID())->$method($value);
 	}
 
 	public function testMaxValidAccountId() : void
@@ -546,16 +457,13 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$s->SetAccountID(-1);
 	}
 
-	public function testSetFromURLWithQueryParameters() : void
+	/**
+	 * @dataProvider validUrlVariationsProvider
+	 */
+	public function testSetFromURLVariations(string $url, string $expected) : void
 	{
-		$s = SteamID::SetFromURL('https://steamcommunity.com/id/xpaw/?l=english', [$this, 'fakeResolveVanityURL']);
-		$this->assertEquals('76561197972494985', $s->ConvertToUInt64());
-	}
-
-	public function testSetFromURLWithSubpages() : void
-	{
-		$s = SteamID::SetFromURL('https://steamcommunity.com/id/xpaw/screenshots/', [$this, 'fakeResolveVanityURL']);
-		$this->assertEquals('76561197972494985', $s->ConvertToUInt64());
+		$s = SteamID::SetFromURL($url, [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals($expected, $s->ConvertToUInt64());
 	}
 
 	public function testCsgoFriendCodeRoundTrip() : void
@@ -701,30 +609,22 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		$this->assertEquals('[g:2:123]', $s->RenderSteam3());
 	}
 
-	public function testFromAccountIDOutOfRangeNegative() : void
+	/**
+	 * @dataProvider fromAccountIdInvalidProvider
+	 */
+	public function testFromAccountIDInvalid(int $accountId) : void
 	{
-		$this->expectException( InvalidArgumentException::class );
-
-		SteamID::FromAccountID( -1 );
+		$this->expectException(InvalidArgumentException::class);
+		SteamID::FromAccountID($accountId);
 	}
 
-	public function testFromAccountIDOutOfRange() : void
+	/**
+	 * @dataProvider staticHelperProvider
+	 */
+	public function testStaticHelpers(string $method, int $input, string $expected) : void
 	{
-		$this->expectException( InvalidArgumentException::class );
-
-		SteamID::FromAccountID( 0xFFFFFFFF + 1 );
-	}
-
-	public function testAccountIDToUInt64() : void
-	{
-		$result = SteamID::AccountIDToUInt64( 123 );
-		$this->assertEquals( '76561197960265851', $result );
-	}
-
-	public function testAccountIDRender() : void
-	{
-		$result = SteamID::RenderAccountID( 123 );
-		$this->assertEquals( '[U:1:123]', $result );
+		$result = SteamID::$method($input);
+		$this->assertEquals($expected, $result);
 	}
 
 	public function testStaticMethodsConsistency() : void
@@ -751,6 +651,8 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 			[ '[C:1:123]' ],
 			[ '[c:1:123]' ],
 			[ '[L:1:123]' ],
+			[ '[P:1:123]' ],
+			[ '[a:1:123]' ],
 		];
 	}
 
@@ -790,6 +692,18 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 			[ '[U:1:009234567]' ],
 			[ '[U:1:01234]' ],
 			[ -1 ],
+			[ "0" ],
+			[ "00000000000000000000" ],
+			[ 'STEAM_0:2:123' ],
+			[ 'STEAM_0:5:123' ],
+			[ '[u:1:123]' ],
+			[ '[U:01:123]' ],
+			[ '[U:1:0123]' ],
+			[ 'U:1:123]' ],
+			[ '[U:1:123' ],
+			[ ' 76561197960265851 ' ],
+			[ ' [U:1:123] ' ],
+			[ '999999999999999999999' ],
 		];
 	}
 
@@ -815,6 +729,13 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 			[ 'http://steamcommunity_com/id/xpaw/' ],
 			[ 'https://steamcommunity,com/profiles/76561210845167618' ],
 			[ 'https://google.com' ],
+			[ 'https://STEAMCOMMUNITY.COM/id/xpaw' ],
+			[ 'https://steamcommunity.com:443/id/xpaw' ],
+			[ 'https://steamcommunity.com/id/test@domain' ],
+			[ 'https://steamcommunity.com/id/xpaw#section' ],
+			[ 'https://steamcommunity.com/id/xpaw?tab=games&sort=recent&filter=all' ],
+			[ 'a' ],
+			[ str_repeat('a', 33) ],
 		];
 	}
 
@@ -868,6 +789,176 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		];
 	}
 
+	public function testSteam2EdgeCases() : void
+	{
+		$s = new SteamID('STEAM_0:0:0');
+		$this->assertEquals(0, $s->GetAccountID());
+		$this->assertEquals(SteamID::UniversePublic, $s->GetAccountUniverse());
+
+		$s = new SteamID('STEAM_4:1:2147483647');
+		$this->assertEquals(4294967295, $s->GetAccountID());
+		$this->assertEquals(SteamID::UniverseDev, $s->GetAccountUniverse());
+	}
+
+	public function testSteam3InvalidTypeHandling() : void
+	{
+		$s = new SteamID('[I:1:123]');
+		$this->assertEquals(SteamID::TypeInvalid, $s->GetAccountType());
+	}
+
+	public function testBoundaryValueConditions() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountID(4294967295);
+		$this->assertEquals(4294967295, $s->GetAccountID());
+
+		$s->SetAccountInstance(1048575);
+		$this->assertEquals(1048575, $s->GetAccountInstance());
+
+		$s->SetAccountType(15);
+		$this->assertEquals(15, $s->GetAccountType());
+
+		$s->SetAccountUniverse(255);
+		$this->assertEquals(255, $s->GetAccountUniverse());
+	}
+
+	public function testInviteCodeDashPlacement() : void
+	{
+		$s = new SteamID('[U:1:15]');
+		$this->assertEquals('w', $s->RenderSteamInvite());
+
+		$s = new SteamID('[U:1:16]');
+		$this->assertEquals('cb', $s->RenderSteamInvite());
+
+		$s = new SteamID('[U:1:255]');
+		$this->assertEquals('ww', $s->RenderSteamInvite());
+
+		$s = new SteamID('[U:1:256]');
+		$this->assertEquals('cbb', $s->RenderSteamInvite());
+	}
+
+	public function testInstanceFlagCombinations() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountType(SteamID::TypeChat);
+		$s->SetAccountInstance(SteamID::InstanceFlagClan | SteamID::InstanceFlagLobby);
+		$s->SetAccountID(123);
+		$s->SetAccountUniverse(SteamID::UniversePublic);
+
+		$this->assertEquals('[c:1:123]', $s->RenderSteam3());
+	}
+
+	public function testSteam2RenderingForInvalidState() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountType(SteamID::TypeClan);
+		$s->SetAccountID(0);
+		$s->SetAccountUniverse(SteamID::UniversePublic);
+
+		$this->assertEquals('103582791429521408', $s->RenderSteam2());
+	}
+
+	public function testLargeNumberHandling() : void
+	{
+		$s = new SteamID('18446744073709551614');
+		$this->assertEquals('18446744073709551614', $s->ConvertToUInt64());
+
+		$s->SetFromUInt64('18446744073709551615');
+		$this->assertEquals('18446744073709551615', $s->ConvertToUInt64());
+	}
+
+	public function testNewlineHandling() : void
+	{
+		$s = new SteamID("76561197960265851\n");
+		$this->assertEquals("76561197960265851", $s->ConvertToUInt64());
+	}
+
+	public function testSteamChinaDomainHandling() : void
+	{
+		$s = SteamID::SetFromURL('https://my.steamchina.com/id/xpaw/', [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals('76561197972494985', $s->ConvertToUInt64());
+
+		$s = SteamID::SetFromURL('http://my.steamchina.com/profiles/76561197972494985', [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals('76561197972494985', $s->ConvertToUInt64());
+	}
+
+	public function testVanityUrlLengthBoundaries() : void
+	{
+		$s = SteamID::SetFromURL('ab', [$this, 'fakeResolveVanityURLSpecial']);
+		$this->assertEquals('76561197960265733', $s->ConvertToUInt64());
+
+		$longVanity = str_repeat('a', 32);
+		$s = SteamID::SetFromURL($longVanity, [$this, 'fakeResolveVanityURLSpecial']);
+		$this->assertEquals('76561197960265733', $s->ConvertToUInt64());
+	}
+
+	public function testInviteUrlCaseInsensitive() : void
+	{
+		$s = SteamID::SetFromURL('https://steamcommunity.com/user/QPN-PMN/', [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals('[U:1:12229257]', $s->RenderSteam3());
+
+		$s = SteamID::SetFromURL('https://s.team/p/QpN-pMn', [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals('[U:1:12229257]', $s->RenderSteam3());
+	}
+
+	public function testInviteUrlWithInvalidCharacters() : void
+	{
+		$s = SteamID::SetFromURL('https://s.team/p/qpn-pmn-xyz123', [$this, 'fakeResolveVanityURL']);
+		$this->assertEquals('[U:1:12229257]', $s->RenderSteam3());
+	}
+
+	public function testP2PSuperSeederAccountType() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountType(SteamID::TypeP2PSuperSeeder);
+		$s->SetAccountUniverse(SteamID::UniversePublic);
+		$s->SetAccountID(123);
+		$this->assertEquals(SteamID::TypeP2PSuperSeeder, $s->GetAccountType());
+		$this->assertTrue($s->IsValid());
+	}
+
+	public function testIndividualAccountInstanceLimit() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountType(SteamID::TypeIndividual);
+		$s->SetAccountUniverse(SteamID::UniversePublic);
+		$s->SetAccountID(123);
+		$s->SetAccountInstance(SteamID::WebInstance + 1);
+		$this->assertFalse($s->IsValid());
+	}
+
+	public function testUnknownAccountTypeRendering() : void
+	{
+		$this->expectException(InvalidArgumentException::class);
+		$s = new SteamID();
+		$s->SetAccountType(99);
+	}
+
+	public function testSetFromUInt64WithFloat() : void
+	{
+		$this->expectException(TypeError::class);
+		$s = new SteamID();
+		$s->SetFromUInt64(123.45);
+	}
+
+	public function testMaxInstanceBoundary() : void
+	{
+		$s = new SteamID();
+		$s->SetAccountType(SteamID::TypeIndividual);
+		$s->SetAccountUniverse(SteamID::UniversePublic);
+		$s->SetAccountID(123);
+		$s->SetAccountInstance(SteamID::WebInstance);
+		$this->assertTrue($s->IsValid());
+	}
+
+	public static function fakeResolveVanityURLSpecial(string $URL, int $Type) : ?string
+	{
+		if ($URL === 'ab' || strlen($URL) === 32) {
+			return '76561197960265733';
+		}
+		return null;
+	}
+
 	public static function fakeResolveVanityURL( string $URL, int $Type ) : ?string
 	{
 		$FakeValues =
@@ -892,5 +983,68 @@ class SteamIDFacts extends PHPUnit\Framework\TestCase
 		];
 
 		return $FakeValues[ $Type ][ $URL ] ?? null;
+	}
+
+	public static function setterOverflowProvider() : array
+	{
+		return [
+			['SetAccountID', 0xFFFFFFFF + 1],
+			['SetAccountType', 0xF + 1],
+			['SetAccountInstance', 0xFFFFF + 1],
+			['SetAccountUniverse', 0xFF + 1],
+		];
+	}
+
+	public static function invalidCsgoCodeProvider() : array
+	{
+		return [
+			['AAAAA-AAAA-AAAAA-AAAA-'],
+			['AAAAAAAAAA'],
+			['AAAAA-AAAA-AAAAAAAAAA'],
+			['AAAAAAAAAA-AAAAA-AAAA'],
+			['AAAAA-AAAAAAAAAA-AAAA'],
+			['STEAM-AM-A'],
+			['11111-1111'],
+			['alqf4-byca'],
+			['ALqf4-BYCA'],
+			['ALQF4-BYCÁ'],
+		];
+	}
+
+	public static function fromAccountIdInvalidProvider() : array
+	{
+		return [
+			[-1],
+			[0xFFFFFFFF + 1],
+		];
+	}
+
+	public static function validUrlVariationsProvider() : array
+	{
+		return [
+			['https://steamcommunity.com/id/xpaw/?l=english', '76561197972494985'],
+			['https://steamcommunity.com/id/xpaw/screenshots/', '76561197972494985'],
+		];
+	}
+
+	public static function staticHelperProvider() : array
+	{
+		return [
+			['AccountIDToUInt64', 123, '76561197960265851'],
+			['RenderAccountID', 123, '[U:1:123]'],
+		];
+	}
+
+	public static function validCsgoCodeProvider() : array
+	{
+		return [
+			['ALQF4-BYCA', '[U:1:12229257]'],
+			['SFW3A-MPAQ', '[U:1:123777904]'],
+			['ALGFL-BYAA', '[U:1:12229257]'],
+			['AQQP4-BZDC', '[U:1:12229257]'],
+			['AQGPL-3EUJ-SYLSB-J5SL', '[U:1:12229257]'],
+			['AJJA6-SSEL-AAJJE-AVBC', '[U:1:1]'],
+			['ATWCB-GBBA-ABLAB-ABCC', '[g:1:4777282]'],
+		];
 	}
 }
