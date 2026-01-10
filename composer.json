@@ -10,6 +10,13 @@
 			"email": "steamid.php@xpaw.me"
 		}
 	],
+	"funding":
+	[
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/xPaw"
+        }
+	],
 	"require":
 	{
 		"php": ">=8.3",
